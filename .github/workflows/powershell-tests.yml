@@ -1,0 +1,77 @@
+name: PowerShell Tests & Quality
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Code Quality & Pester Tests
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install PowerShell Testing Dependencies
+        shell: powershell
+        run: |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          if (-not (Get-PackageProvider -ListAvailable -Name NuGet)) {
+              Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser
+          }
+          if (-not (Get-Module -ListAvailable -Name PSScriptAnalyzer)) {
+              Install-Module -Name PSScriptAnalyzer -Scope CurrentUser -Force -SkipPublisherCheck
+          }
+          if (-not (Get-Module -ListAvailable -Name Pester | Where-Object { $_.Version.Major -ge 5 })) {
+              Install-Module -Name Pester -Scope CurrentUser -Force -SkipPublisherCheck -MinimumVersion 5.0.0
+          }
+
+      - name: Run PSScriptAnalyzer
+        shell: powershell
+        run: |
+          Import-Module PSScriptAnalyzer
+          Write-Host "Analyzing scripts in repository..." -ForegroundColor Cyan
+          $issues = Invoke-ScriptAnalyzer -Path . -Settings .\PSScriptAnalyzerSettings.psd1 -Recurse
+          if ($issues) {
+              $issues | Format-Table -AutoSize
+              $errors = $issues | Where-Object { $_.Severity -eq 'Error' }
+              if ($errors) {
+                  Write-Error "PSScriptAnalyzer identified $($errors.Count) critical error(s)."
+                  exit 1
+              }
+              $warnings = $issues | Where-Object { $_.Severity -eq 'Warning' }
+              if ($warnings) {
+                  Write-Warning "PSScriptAnalyzer identified $($warnings.Count) warning(s)."
+              }
+          } else {
+              Write-Host "PSScriptAnalyzer passed: No issues found." -ForegroundColor Green
+          }
+
+      - name: Run Pester Tests
+        shell: powershell
+        run: |
+          Import-Module Pester -MinimumVersion 5.0.0
+          Write-Host "Executing Pester test suites..." -ForegroundColor Cyan
+          $config = [PesterConfiguration]::Default
+          $config.Run.Path = @(".\tests\Unit", ".\tests\Integration")
+          $config.TestRegistry.Enabled = $false
+          $config.Output.Verbosity = 'Detailed'
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputPath = ".\test-results.xml"
+          $config.TestResult.OutputFormat = "NUnitXml"
+          $config.Run.Exit = $true
+          $result = Invoke-Pester -Configuration $config
+          if ($result.FailedCount -gt 0) {
+              Write-Error "Pester tests failed: $($result.FailedCount) test(s) failed."
+              exit 1
+          }
+          Write-Host "All Pester tests passed successfully." -ForegroundColor Green
