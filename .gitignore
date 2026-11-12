@@ -1,0 +1,11 @@
+# Local logs, reports, backups and generated artifacts
+*.log
+Backups/
+DisabledStartupFolderItems/
+SystemReport-*.txt
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
