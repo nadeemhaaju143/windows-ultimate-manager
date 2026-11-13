@@ -4,6 +4,11 @@ Backups/
 DisabledStartupFolderItems/
 SystemReport-*.txt
 
+# Test results and artifacts
+test-results.xml
+TestResults/
+*.nupkg
+
 # Editor / OS files
 .vscode/
 .idea/
