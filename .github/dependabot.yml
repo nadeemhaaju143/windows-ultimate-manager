@@ -1,0 +1,24 @@
+# GitHub Dependabot Configuration
+# Windows Ultimate Manager | NH Digital
+# Reference: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Maintain GitHub Actions workflow dependencies weekly
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Etc/UTC"
+    # Sensible limit on simultaneous open pull requests to avoid noise
+    open-pull-requests-limit: 5
+    reviewers:
+      - "nadeemhaaju143"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci(deps)"
+      include: "scope"

@@ -20,6 +20,9 @@ All notable changes to **Windows Ultimate Manager** are documented in this file.
 - **Continuous Integration (CI)**:
   - GitHub Actions workflow (`.github/workflows/powershell-tests.yml`) running static analysis and Pester tests on Windows runners.
   - Minimal read permissions and pinned action commit SHAs.
+- **Dependency Management (Dependabot)**:
+  - Added `.github/dependabot.yml` configuring weekly dependency updates for the `github-actions` ecosystem.
+  - Set open pull request limit to 5 to prevent PR flooding, kept security updates enabled, disabled auto-merging, and ensured all PRs must pass the CI test suite before merging.
 
 ### Improved
 - **PowerShell Script Modularization & Safety (`src/Windows-Safe-Manager.ps1`)**:
