@@ -1,4 +1,3 @@
-
 name: PowerShell Tests & Quality
 
 on:
@@ -18,6 +17,7 @@ jobs:
 
     steps:
       - name: Checkout repository
+        # Pinned to v7.0.1 (runs on Node.js 24 runtime, eliminating Node.js 20 deprecation warnings)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false

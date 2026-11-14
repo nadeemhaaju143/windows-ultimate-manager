@@ -24,6 +24,10 @@ All notable changes to **Windows Ultimate Manager** are documented in this file.
   - Added `.github/dependabot.yml` configuring weekly dependency updates for the `github-actions` ecosystem.
   - Set open pull request limit to 5 to prevent PR flooding, kept security updates enabled, disabled auto-merging, and ensured all PRs must pass the CI test suite before merging.
 
+### Fixed
+- **GitHub Actions Node.js Deprecation (`.github/workflows/powershell-tests.yml`)**:
+  - Eliminated GitHub Actions Node.js 20 deprecation warnings by updating `actions/checkout` to latest stable release `v7.0.1` (`3d3c42e5aac5ba805825da76410c181273ba90b1`), executing natively on the Node.js 24 runtime environment.
+
 ### Improved
 - **PowerShell Script Modularization & Safety (`src/Windows-Safe-Manager.ps1`)**:
   - Added dot-source guard to allow importing functions for testing without automatically launching the interactive console menu.
